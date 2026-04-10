@@ -9,6 +9,9 @@
 #include <errno.h> // Error constants
 #include <string.h>
 
+#include "get_num.h"
+#include "error_functions.h"
+
 #define min(m,n) ((m) < (n) ? (m) : (n))
 #define min(m,n) ((m) > (n) ? (m) : (n))
 
