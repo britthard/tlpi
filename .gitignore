@@ -1,4 +1,5 @@
 *.vim
+tags
 scratch.*
 a.out
 *.so

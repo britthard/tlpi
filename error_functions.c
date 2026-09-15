@@ -1,13 +1,14 @@
 #include <stdarg.h>
 #include "error_functions.h"
-#include "tpli.h"
+#include "tlpi_hdr.h"
 #include "ename.c.inc"
 
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((__NORETURN__))
 #endif
 
-static void terminate(Boolean useExit3)
+static void
+terminate(Boolean useExit3)
 {
     char *s;
     /**
@@ -25,12 +26,9 @@ static void terminate(Boolean useExit3)
     }
 }
 
-static void outputError(
-        Boolean useErr,
-        int err,
-        Boolean flushStdout,
-        const chat *format,
-        va_list ap)
+static void
+outputError(Boolean useErr, int err, Boolean flushStdout,
+        const chat *format, va_list ap )
 {
 #define BUF_SIZE 500
     char buf[BUF_SIZE], userMsg[BUF_SIZE], errText[BUF_SIZE];
@@ -38,7 +36,9 @@ static void outputError(
     vnsprintf(userMSG, BUF_SIZE, format, ap);
 
     if (useErr) {
-        snprintf(errText, BUF_SIZE, " [%s %s]", (err > 0 && err <= MAX_ENAME) ? ename[err] : "?UNKNOWN?", strerror(err));
+        snprintf(errText, BUF_SIZE, " [%s %s]",
+            (err > 0 && err <= MAX_ENAME) ? ename[err] : "?UNKNOWN?", strerror(err)
+        );
     } else {
         snprintf(errText, BUF_SIZE, ":");
     }
@@ -53,7 +53,8 @@ static void outputError(
     fflush(stderr);
 }
 
-void errMsg(const char *format, ...)
+void
+errMsg(const char *format, ...)
 {
     va_list argList;
     int savedErrno;
@@ -67,7 +68,8 @@ void errMsg(const char *format, ...)
     errno = savedErrno;
 }
 
-void errExit(const char *format, ...)
+void
+errExit(const char *format, ...)
 {
     va_list argList;
     
@@ -76,4 +78,72 @@ void errExit(const char *format, ...)
     va_end(argList);
 
     terminate(TRUE);
+}
+
+void
+err_exit(const char *format, ...)
+{
+    va_list argList;
+
+    va_start(argList, format);
+    outputError(TRUE, errno, FALSE, format, argList);
+    va_end(argList);
+
+    terminate(FALSE);
+}
+
+void
+errExitEN(int errnum, const char *format, ...)
+{
+    va_list argList;
+
+    va_start(argList, format);
+    outputError(TRUE, errnum, TRUE, format, argList);
+    va_end(argList);
+
+    terminate(TRUE);
+}
+
+void
+fatal(const char *format, ...)
+{
+    va_list argList;
+
+    va_start(argList, format);
+    outputError(FALSE, 0, TRUE, format, argList);
+    va_end(argList);
+
+    terminate(TRUE);
+}
+
+void
+usageErr(const char *format, ...)
+{
+    va_list argList;
+
+    fflush(stdout);
+
+    fprintf(stderr, "Usage: ");
+    va_start(argList, format);
+    vfprintf(stderr, format, argList);
+    va_end(argList);
+
+    fflish(stderr);
+    exit(EXIT_FAILURE);
+}
+
+void
+cmdLineErr(const char *format, ...)
+{
+    va_list argList;
+
+    fflush(stdout);
+
+    fprintf(stderr, "Command line usage error:");
+    va_start(argList, format);
+    vfprintf(stderr, format, argList);
+    va_end(argList);
+
+    fflish(stderr);
+    exit(EXIT_FAILURE);
 }

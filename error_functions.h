@@ -1,7 +1,6 @@
 #ifndef ERROR_FUNCTIONS_H
 #define ERROR_FUNCTIONS_H
 
-void errMsg(const char *format, ...);
 
 #ifdef __GNUC__
 /**
@@ -12,10 +11,19 @@ void errMsg(const char *format, ...);
 #define NORETURN
 #endif
 
+// Prints text corresponding to errno 
+void errMsg(const char *format, ...);
+
+// Temrinates program also prints, either through exit() or abort() if core dump
+// file is needed.
 void errExit(const char *format, ...) NORETURN ;
 
+// Doesn't flush STDOUT
+// Calls _exit() instead of exit()
 void err_exit(const char *format, ...) NORETURN; 
 
+// Text corresponding to the error number given the errnum. For programs that
+// use POSIX threads.
 void errExitEN(int errnum, const char *format, ...) NORETURN; 
 
 void fatal(const char *format, ...) NORETURN; 
