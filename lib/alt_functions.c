@@ -8,21 +8,40 @@
 * See the files COPYING.lgpl-v3 and COPYING.gpl-v3 for details.           *
 \*************************************************************************/
 
-/* Listing 3-5 */
+/* Supplementary program for Chapter 3 */
 
-#ifndef GET_NUM_H
-#define GET_NUM_H
+#include <stdio.h>
+#include <fcntl.h>
+#include "alt_functions.h"
 
-#define GN_NONNEG       01      /* Value must be >= 0 */
-#define GN_GT_0         02      /* Value must be > 0 */
+/* A very minimal implementation of strsignal()... */
 
-                                /* By default, integers are decimal */
-#define GN_ANY_BASE   0100      /* Can use any base - like strtol(3) */
-#define GN_BASE_8     0200      /* Value is expressed in octal */
-#define GN_BASE_16    0400      /* Value is expressed in hexadecimal */
+#define BUF_SIZE 100
 
-long getLong(const char *arg, int flags, const char *name);
+char *
+ALT_strsignal(int sig)
+{
+    static char buf[BUF_SIZE];          /* Not thread-safe */
 
-int getInt(const char *arg, int flags, const char *name);
+    snprintf(buf, BUF_SIZE, "SIG-%d", sig);
+    return buf;
+}
 
-#endif
+/* A very minimal implementation of hstrerror()... */
+
+char *
+ALT_hstrerror(int err)
+{
+    static char buf[BUF_SIZE];          /* Not thread-safe */
+
+    snprintf(buf, BUF_SIZE, "hstrerror-%d", err);
+    return buf;
+}
+
+/* posix_openpt() is simple to implement */
+
+int
+ALT_posix_openpt(int flags)
+{
+    return open("/dev/ptmx", flags);
+}
